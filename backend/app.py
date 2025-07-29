@@ -14,8 +14,8 @@ CORS(app)
 limiter = Limiter(get_remote_address, app=app, default_limits=["100 per minute"])
 
 mongo_uri = os.getenv("MONGO_URI")
-db_name = os.getenv("DB_NAME", "dashboard")
-collection_name = os.getenv("COLLECTION_NAME", "insights")
+db_name = os.getenv("DB_NAME")
+collection_name = os.getenv("COLLECTION_NAME")
 
 client = MongoClient(mongo_uri)
 db = client[db_name]
@@ -42,41 +42,42 @@ def filter_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/api/graph/bar", methods=["GET"])
-def get_bar_data():
-    try:
-        pipeline = [
-            {"$group": {"_id": "$region", "total_intensity": {"$sum": "$intensity"}}},
-            {"$sort": {"total_intensity": -1}}
-        ]
-        data = list(collection.aggregate(pipeline))
-        return jsonify(data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @app.route("/api/graph/bar", methods=["GET"])
+# def get_bar_data():
+#     try:
+#         pipeline = [
+#             {"$group": {"_id": "$region", "total_intensity": {"$sum": "$intensity"}}},
+#             {"$sort": {"total_intensity": -1}}
+#         ]
+#         data = list(collection.aggregate(pipeline))
+#         return jsonify(data)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
-@app.route("/api/graph/line", methods=["GET"])
-def get_line_data():
-    try:
-        pipeline = [
-            {"$group": {"_id": "$end_year", "avg_likelihood": {"$avg": "$likelihood"}}},
-            {"$sort": {"_id": 1}}
-        ]
-        data = list(collection.aggregate(pipeline))
-        return jsonify(data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @app.route("/api/graph/line", methods=["GET"])
+# def get_line_data():
+#     try:
+#         pipeline = [
+#             {"$group": {"_id": "$end_year", "avg_likelihood": {"$avg": "$likelihood"}}},
+#             {"$sort": {"_id": 1}}
+#         ]
+#         data = list(collection.aggregate(pipeline))
+#         return jsonify(data)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
-@app.route("/api/graph/pie", methods=["GET"])
-def get_pie_data():
-    try:
-        pipeline = [
-            {"$group": {"_id": "$pestle", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}}
-        ]
-        data = list(collection.aggregate(pipeline))
-        return jsonify(data)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @app.route("/api/graph/pie", methods=["GET"])
+# def get_pie_data():
+#     try:
+#         pipeline = [
+#             {"$group": {"_id": "$pestle", "count": {"$sum": 1}}},
+#             {"$sort": {"count": -1}}
+#         ]
+#         data = list(collection.aggregate(pipeline))
+#         return jsonify(data)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=False)
