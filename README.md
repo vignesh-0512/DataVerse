@@ -1,4 +1,3 @@
-# app.py
 
 A Python Flask API that provides access to data stored in MongoDB with support for filtering and rate limiting.
 
